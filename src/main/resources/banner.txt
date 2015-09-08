@@ -1,0 +1,4 @@
+${application.version}=1.0
+${application.formatted-version}=(Araport Data Validation v1.0)
+${spring-boot.version}=1.2.5.RELEASE
+${spring-boot.formatted-version}=1.2.5.RELEASE
