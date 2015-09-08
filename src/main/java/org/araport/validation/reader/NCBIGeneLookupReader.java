@@ -1,6 +1,6 @@
 package org.araport.validation.reader;
 
-import org.araport.validation.domain.Person;
+import org.araport.validation.domain.ReaderLine;
 import org.araport.validation.domain.TAIRLocusPublication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +18,13 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-@Component("tair_publication_reader")
+@Component("ncbi_gene_lookup_reader")
 @PropertySources(value = { @PropertySource("classpath:/in/data_source.properties")
 })
-public class TAIRPublicationReader {
-
+public class NCBIGeneLookupReader {
 	private static final Logger log = LoggerFactory
-			.getLogger(TAIRPublicationReader.class);
-
+			.getLogger(NCBIGeneLookupReader.class);
+	
 	@Autowired
 	Environment environment;
 
@@ -33,27 +32,24 @@ public class TAIRPublicationReader {
 	private ResourceLoader resourceLoader;
 	
 	@Bean
-	public ItemReader<TAIRLocusPublication> tairLocusPublicationReader() {
-	        FlatFileItemReader<TAIRLocusPublication> reader = new FlatFileItemReader<TAIRLocusPublication>();
-	        reader.setResource(new FileSystemResource(environment.getProperty("tair.publication.path")));
+	public ItemReader<ReaderLine> tairLocusPublicationReader() {
+		
+	        FlatFileItemReader<ReaderLine> reader = new FlatFileItemReader<ReaderLine>();
+	        reader.setResource(new FileSystemResource(environment.getProperty("gene.pubmed.lookup.path")));
 	        
 	        final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer() {{
-                setNames(new String[] { "locusAGIId", "tairObjectId", "pubMedId", "year" });
+                setNames(new String[] { "line" });
             }};
             
-            lineTokenizer.setDelimiter("\t");
-            
-            lineTokenizer.setNames(new String[] { "locusAGIId", "tairObjectId", "pubMedId", "year" });
-            
-	        reader.setLineMapper(new DefaultLineMapper<TAIRLocusPublication>() {{
+                
+	        reader.setLineMapper(new DefaultLineMapper<ReaderLine>() {{
 	            setLineTokenizer(lineTokenizer);
-	            setFieldSetMapper(new BeanWrapperFieldSetMapper<TAIRLocusPublication>() {{
-	                setTargetType(TAIRLocusPublication.class);
+	            setFieldSetMapper(new BeanWrapperFieldSetMapper<ReaderLine>() {{
+	                setTargetType(ReaderLine.class);
 	            }});
 	        }});
 	        
 	        return reader;
 	    }
-	
 	
 }

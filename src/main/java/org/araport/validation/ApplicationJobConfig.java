@@ -44,6 +44,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.ResourceLoader;
+import org.araport.validation.exception.LocalExceptionHandler;
 
 @Configuration
 @EnableBatchProcessing
@@ -140,9 +141,11 @@ public class ApplicationJobConfig {
 	public Step step2() {
 		return stepBuilders.get(StepConfig.TAIR_PUBLICATION_FLAT_FILE_STEP)
 				.<TAIRLocusPublication, TAIRLocusPublication> chunk(10)
+				.faultTolerant()
 				.reader(tairLocusPublicationReader)
 				.processor(tairPublicationProcessor)
 				.writer(tairPublicationWriter).listener(logProcessListener)
+				.exceptionHandler(new LocalExceptionHandler())
 				.build();
 	}
 
