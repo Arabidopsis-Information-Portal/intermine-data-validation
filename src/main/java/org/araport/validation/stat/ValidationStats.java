@@ -4,20 +4,75 @@ public class ValidationStats {
 	
 	public static Counter tairPubLocusRecordCount = new Counter();
 	
+	public static Counter ncbiGeneLookupInputRecordCount = new Counter();
+	
+	public static Counter ncbiGeneLookupProcessedRecordCount = new Counter();
+	
+	public static Counter ncbiGeneLookupSkippedRecordCount = new Counter();
+	
+	public static Counter ncbiGeneNotTargetLookupTaxonRecordCount = new Counter();
+	
+	public static Counter ncbiGenePubMedInputRecordCount = new Counter();
+	
+	public static Counter ncbiGenePubMedInputProcessedRecordCount = new Counter();
+	
+	public static Counter ncbiGenePubMedInputSkippedRecordCount = new Counter();
+	
+	public static Counter ncbiGenePubMedGeneNotTargetLookupTaxonRecordCount = new Counter();
+	
 	
 	public static String getStatistics() {
-		StringBuilder result = new StringBuilder("Statistics: "
+		StringBuilder result = new StringBuilder("Overall Statistics: "
 				+ "\n");
 
 		result.append("Total TAIR Locus to Pub Record Count: "
-				+  tairPubLocusRecordCount.getValue());
+				+  tairPubLocusRecordCount.getValue() + "\n");
+		
+		result.append(getNCBIGeneLookupStatistics());
 				
-
-		if (result != null) {
-			return result.toString();
-		} else {
-			return null;
-		}
+		return result.toString();
+	}
+	
+	public static String getNCBIGeneLookupStatistics() {
+		
+		StringBuilder result = new StringBuilder("Statistics: "
+				+ "\n");
+		
+		result.append("Total NCBI Gene Lookup Record Input Count: "
+				+   ncbiGeneLookupInputRecordCount.getValue() + "\n");
+		
+		result.append("Total NCBI Gene Lookup Not Target Lookup Taxon Count (Skipped): "
+				+   ncbiGeneNotTargetLookupTaxonRecordCount.getValue() + "\n");
+		
+		result.append("Total Gene Lookup NCBI Processed Record Count: "
+				+   ncbiGeneLookupProcessedRecordCount.getValue() + "\n");
+		
+		result.append("Total Gene Lookup NCBI Skipped/Error Record Count: "
+				+   ncbiGeneLookupSkippedRecordCount.getValue() + "\n");
+		
+		return result.toString();
+		
+	}
+	
+public static String getNCBIGenePubMedStatistics() {
+		
+		StringBuilder result = new StringBuilder("Statistics: "
+				+ "\n");
+		
+		result.append("Total NCBI Gene PubMed Record Input Count: "
+				+   ncbiGenePubMedInputRecordCount.getValue() + "\n");
+		
+		result.append("Total NCBI Gene PubMed  Not Target Lookup Taxon Count (Skipped): "
+				+   ncbiGenePubMedGeneNotTargetLookupTaxonRecordCount.getValue() + "\n");
+		
+		result.append("Total NCBI Gene PubMed  Processed Record Count: "
+				+   ncbiGenePubMedInputProcessedRecordCount.getValue() + "\n");
+		
+		result.append("Total NCBI Gene PubMed Skipped/Error Record Count: "
+				+   ncbiGenePubMedInputSkippedRecordCount.getValue() + "\n");
+		
+		return result.toString();
+		
 	}
 
 }

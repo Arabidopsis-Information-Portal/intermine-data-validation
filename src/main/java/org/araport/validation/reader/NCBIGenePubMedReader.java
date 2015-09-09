@@ -1,9 +1,11 @@
 package org.araport.validation.reader;
 
 import org.araport.validation.domain.NCBIGeneLookup;
+import org.araport.validation.domain.NCBIPubMedGene;
 import org.araport.validation.domain.ReaderLine;
 import org.araport.validation.domain.TAIRLocusPublication;
 import org.araport.validation.fieldmapper.NCBIGeneLookupFieldMapper;
+import org.araport.validation.fieldmapper.NCBIGenePubMedFieldMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemReader;
@@ -21,34 +23,37 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-@Component("ncbi_gene_lookup_reader")
+@Component("ncbi_gene_pubmed_reader")
 @PropertySources(value = { @PropertySource("classpath:/in/data_source.properties")
 })
-public class NCBIGeneLookupReader {
+public class NCBIGenePubMedReader {
 	private static final Logger log = LoggerFactory
-			.getLogger(NCBIGeneLookupReader.class);
+			.getLogger(NCBIGenePubMedReader.class);
 	
 	@Autowired
 	Environment environment;
 
 	@Autowired
 	private ResourceLoader resourceLoader;
-
+	
+	private String [] comments = {"#"};
+	
 	@Bean
-	public ItemReader<NCBIGeneLookup> ncbiGeneLookupReader() {
+	public ItemReader<NCBIPubMedGene> ncbiGenePubMedReader() {
 		
-	        FlatFileItemReader<NCBIGeneLookup> reader = new FlatFileItemReader<NCBIGeneLookup>();
+	        FlatFileItemReader<NCBIPubMedGene> reader = new FlatFileItemReader<NCBIPubMedGene>();
 	        
-	        reader.setResource(new FileSystemResource(environment.getProperty("gene.pubmed.lookup.path")));
+	        reader.setResource(new FileSystemResource(environment.getProperty("gene.pubmed.data.path")));
 	        
 	        final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
 	                   
             lineTokenizer.setDelimiter("\t");
-            DefaultLineMapper<NCBIGeneLookup> lineMapper =    new DefaultLineMapper<NCBIGeneLookup>();
+            DefaultLineMapper<NCBIPubMedGene> lineMapper =    new DefaultLineMapper<NCBIPubMedGene>();
             lineMapper.setLineTokenizer(lineTokenizer);
-            lineMapper.setFieldSetMapper(new NCBIGeneLookupFieldMapper());
+            lineMapper.setFieldSetMapper(new NCBIGenePubMedFieldMapper());
             reader.setLineMapper(lineMapper);
 	        reader.setLinesToSkip(1);
+	        reader.setComments(comments);
 	       //.setMaxItemCount(10);
 	              
 	        return reader;

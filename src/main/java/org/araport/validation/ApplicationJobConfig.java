@@ -3,14 +3,21 @@ package org.araport.validation;
 import org.araport.validation.bean.ListenerBeans;
 import org.araport.validation.bean.ProcessorBeans;
 import org.araport.validation.bean.TaskBeans;
+import org.araport.validation.domain.NCBIGeneLookup;
+import org.araport.validation.domain.NCBIPubMedGene;
 import org.araport.validation.domain.Person;
+import org.araport.validation.domain.ReaderLine;
 import org.araport.validation.domain.TAIRLocusPublication;
 import org.araport.validation.listener.LogProcessListener;
 import org.araport.validation.processor.PersonItemProcessor;
+import org.araport.validation.reader.NCBIGeneLookupReader;
+import org.araport.validation.reader.NCBIGenePubMedReader;
 import org.araport.validation.reader.PersonReader;
 import org.araport.validation.reader.TAIRPublicationReader;
 import org.araport.validation.tasklet.PostDeployTasklet;
 import org.araport.validation.tasklet.StagingSchemaInitTasklet;
+import org.araport.validation.writer.NCBIGeneLookupWriter;
+import org.araport.validation.writer.NCBIGenePubMedWriter;
 import org.araport.validation.writer.PersonWriter;
 import org.araport.validation.writer.TAIRPublicationWriter;
 import org.slf4j.Logger;
@@ -51,7 +58,11 @@ import org.araport.validation.exception.LocalExceptionHandler;
 @PropertySources(value = { @PropertySource("classpath:/in/data_source.properties") })
 @Import({ PersonWriter.class, PersonReader.class, ListenerBeans.class,
 		ProcessorBeans.class, TAIRPublicationReader.class,
-		TAIRPublicationWriter.class, TaskBeans.class })
+		TAIRPublicationWriter.class, TaskBeans.class,
+		NCBIGeneLookupReader.class, NCBIGeneLookupWriter.class,
+		NCBIGenePubMedReader.class,
+		NCBIGenePubMedWriter.class
+})
 public class ApplicationJobConfig {
 
 	private static final Logger log = LoggerFactory
@@ -92,6 +103,24 @@ public class ApplicationJobConfig {
 
 	@Autowired
 	ItemWriter<TAIRLocusPublication> tairPublicationWriter;
+
+	@Autowired
+	ItemReader<NCBIGeneLookup> ncbiGeneLookupReader;
+
+	@Autowired
+	ItemProcessor<NCBIGeneLookup, NCBIGeneLookup> ncbiGeneLookupProcessor;
+
+	@Autowired
+	ItemWriter<NCBIGeneLookup> ncbiGeneLookupWriter;
+
+	@Autowired
+	ItemReader<NCBIPubMedGene> ncbiGenePubMedReader;
+
+	@Autowired
+	ItemProcessor<NCBIPubMedGene, NCBIPubMedGene> ncbiGenePubMedProcessor;
+	
+	@Autowired
+	ItemWriter<NCBIPubMedGene> ncbiGenePubMedWriter;
 
 	@Autowired
 	LogProcessListener logProcessListener;
@@ -141,18 +170,40 @@ public class ApplicationJobConfig {
 	public Step step2() {
 		return stepBuilders.get(StepConfig.TAIR_PUBLICATION_FLAT_FILE_STEP)
 				.<TAIRLocusPublication, TAIRLocusPublication> chunk(10)
-				.faultTolerant()
-				.reader(tairLocusPublicationReader)
+				.faultTolerant().reader(tairLocusPublicationReader)
 				.processor(tairPublicationProcessor)
 				.writer(tairPublicationWriter).listener(logProcessListener)
-				.exceptionHandler(new LocalExceptionHandler())
-				.build();
+				.exceptionHandler(new LocalExceptionHandler()).build();
+	}
+
+	@Bean
+	public Step step3() {
+		return stepBuilders.get(StepConfig.NCBI_GENE_LOOKUP_FLAT_FILE_STEP)
+				.<NCBIGeneLookup, NCBIGeneLookup> chunk(10000).faultTolerant()
+				.reader(ncbiGeneLookupReader)
+				.processor(ncbiGeneLookupProcessor)
+				.writer(ncbiGeneLookupWriter).listener(logProcessListener)
+				.exceptionHandler(new LocalExceptionHandler()).build();
+	}
+	
+	@Bean
+	public Step step4() {
+		return stepBuilders.get(StepConfig.NCBI_GENE_PUBMED_FLAT_FILE_STEP)
+				.<NCBIPubMedGene, NCBIPubMedGene> chunk(10000).faultTolerant()
+				.reader(ncbiGenePubMedReader)
+				.processor(ncbiGenePubMedProcessor)
+				.writer(ncbiGenePubMedWriter).listener(logProcessListener)
+				.exceptionHandler(new LocalExceptionHandler()).build();
 	}
 
 	@Bean
 	public Job job() {
 		return jobBuilders.get("validationJob").start(stagingSchemaInitStep())
-				.next(step1()).next(step2()).next(postDeployStep()).build();
+				.next(step1())
+				// .next(step2())
+				.next(step3())
+				.next(step4())
+				.next(postDeployStep()).build();
 	}
 
 	@Bean
