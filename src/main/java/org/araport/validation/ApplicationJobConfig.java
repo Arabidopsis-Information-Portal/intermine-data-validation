@@ -201,7 +201,7 @@ public class ApplicationJobConfig {
 		return jobBuilders.get("validationJob").start(stagingSchemaInitStep())
 				.next(step1())
 				// .next(step2())
-				.next(step3())
+				//.next(step3())
 				.next(step4())
 				.next(postDeployStep()).build();
 	}

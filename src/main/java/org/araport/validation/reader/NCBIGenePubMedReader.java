@@ -54,7 +54,7 @@ public class NCBIGenePubMedReader {
             reader.setLineMapper(lineMapper);
 	        reader.setLinesToSkip(1);
 	        reader.setComments(comments);
-	       //.setMaxItemCount(10);
+	        //reader.setMaxItemCount(10);
 	              
 	        return reader;
 	    }

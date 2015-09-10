@@ -32,11 +32,11 @@ public class NCBIGenePubMedProcessor implements
 	@Override
 	public NCBIPubMedGene process(NCBIPubMedGene item) throws Exception {
 
-		ValidationStats.ncbiGeneLookupInputRecordCount.increment();
+		ValidationStats.ncbiGenePubMedInputRecordCount.increment();
 				
 		log.info("Input NCBI Gene PubMed Input Record : " + item);
 
-		ValidationStats.ncbiGeneLookupProcessedRecordCount.increment();
+		ValidationStats.ncbiGenePubMedInputProcessedRecordCount.increment();
 
 		log.info("Output NCBI Gene PubMed Record: " + item);
 
