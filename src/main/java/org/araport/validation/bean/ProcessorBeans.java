@@ -5,10 +5,13 @@ import org.araport.validation.domain.NCBIPubMedGene;
 import org.araport.validation.domain.Person;
 import org.araport.validation.domain.ReaderLine;
 import org.araport.validation.domain.TAIRLocusPublication;
+import org.araport.validation.domain.UniprotEntry;
 import org.araport.validation.processor.NCBIGeneLookupProcessor;
 import org.araport.validation.processor.NCBIGenePubMedProcessor;
 import org.araport.validation.processor.PersonItemProcessor;
 import org.araport.validation.processor.TAIRPublicationItemProcessor;
+import org.araport.validation.processor.UniprotEntrySwissProtItemProcessor;
+import org.araport.validation.processor.UniprotEntryTrembItemProcessor;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.context.annotation.Bean;
 
@@ -34,6 +37,19 @@ public class ProcessorBeans {
 	@Bean
 	ItemProcessor<NCBIPubMedGene, NCBIPubMedGene> ncbiGenePubMedProcessor(){
 		return new NCBIGenePubMedProcessor();
+	}
+	
+		
+	@Bean
+	ItemProcessor<UniprotEntry, UniprotEntry> uniprotEntrySwissProtProcessor(){
+		return new UniprotEntrySwissProtItemProcessor();
+	}
+	
+	
+	
+	@Bean
+	ItemProcessor<UniprotEntry, UniprotEntry> uniprotEntryTremblProcessor(){
+		return new UniprotEntryTrembItemProcessor();
 	}
 	
 }

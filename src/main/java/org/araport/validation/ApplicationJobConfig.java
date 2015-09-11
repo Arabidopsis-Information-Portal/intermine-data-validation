@@ -8,18 +8,24 @@ import org.araport.validation.domain.NCBIPubMedGene;
 import org.araport.validation.domain.Person;
 import org.araport.validation.domain.ReaderLine;
 import org.araport.validation.domain.TAIRLocusPublication;
+import org.araport.validation.domain.UniprotEntry;
+import org.araport.validation.listener.JobListener;
 import org.araport.validation.listener.LogProcessListener;
 import org.araport.validation.processor.PersonItemProcessor;
 import org.araport.validation.reader.NCBIGeneLookupReader;
 import org.araport.validation.reader.NCBIGenePubMedReader;
 import org.araport.validation.reader.PersonReader;
 import org.araport.validation.reader.TAIRPublicationReader;
+import org.araport.validation.reader.UniprotSwissProtXMLReader;
+import org.araport.validation.reader.UniprotTremblXMLReader;
 import org.araport.validation.tasklet.PostDeployTasklet;
 import org.araport.validation.tasklet.StagingSchemaInitTasklet;
 import org.araport.validation.writer.NCBIGeneLookupWriter;
 import org.araport.validation.writer.NCBIGenePubMedWriter;
 import org.araport.validation.writer.PersonWriter;
 import org.araport.validation.writer.TAIRPublicationWriter;
+import org.araport.validation.writer.UniprotEntrySwissProtWriter;
+import org.araport.validation.writer.UniprotEntryTremblWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -40,6 +46,7 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -61,7 +68,11 @@ import org.araport.validation.exception.LocalExceptionHandler;
 		TAIRPublicationWriter.class, TaskBeans.class,
 		NCBIGeneLookupReader.class, NCBIGeneLookupWriter.class,
 		NCBIGenePubMedReader.class,
-		NCBIGenePubMedWriter.class
+		NCBIGenePubMedWriter.class,
+		UniprotSwissProtXMLReader.class,
+		UniprotEntrySwissProtWriter.class,
+		UniprotTremblXMLReader.class,
+		UniprotEntryTremblWriter.class
 })
 public class ApplicationJobConfig {
 
@@ -121,9 +132,30 @@ public class ApplicationJobConfig {
 	
 	@Autowired
 	ItemWriter<NCBIPubMedGene> ncbiGenePubMedWriter;
+	
+	@Autowired
+	ItemReader<UniprotEntry> uniprotSwissProtReader;
+	
+	@Autowired
+	ItemProcessor<UniprotEntry, UniprotEntry> uniprotEntrySwissProtProcessor;
+	
+	@Autowired
+	ItemWriter<UniprotEntry> uniprotSwissProtWriter;
+	
+	@Autowired
+	ItemReader<UniprotEntry> uniprotTremblReader;
+	
+	@Autowired
+	ItemWriter<UniprotEntry> uniprotTremblWriter;
+	
+	@Autowired
+	ItemProcessor<UniprotEntry, UniprotEntry> uniprotEntryTremblProcessor;
 
 	@Autowired
 	LogProcessListener logProcessListener;
+	
+	@Autowired
+	JobListener jobListener;
 
 	@Bean
 	public ResourcelessTransactionManager transactionManager() {
@@ -169,7 +201,7 @@ public class ApplicationJobConfig {
 	@Bean
 	public Step step2() {
 		return stepBuilders.get(StepConfig.TAIR_PUBLICATION_FLAT_FILE_STEP)
-				.<TAIRLocusPublication, TAIRLocusPublication> chunk(10)
+				.<TAIRLocusPublication, TAIRLocusPublication> chunk(5000)
 				.faultTolerant().reader(tairLocusPublicationReader)
 				.processor(tairPublicationProcessor)
 				.writer(tairPublicationWriter).listener(logProcessListener)
@@ -195,14 +227,39 @@ public class ApplicationJobConfig {
 				.writer(ncbiGenePubMedWriter).listener(logProcessListener)
 				.exceptionHandler(new LocalExceptionHandler()).build();
 	}
+	
+	@Bean
+	public Step step5() {
+		return stepBuilders.get(StepConfig.UNIPROT_SWISS_PRO_XML_FILE_STEP)
+				.<UniprotEntry, UniprotEntry> chunk(5000)
+				.reader(uniprotSwissProtReader)
+				.processor(uniprotEntrySwissProtProcessor)
+				.writer(uniprotSwissProtWriter)
+				.listener(logProcessListener)
+				.build();
+	}
 
+	
+	@Bean
+	public Step step6() {
+		return stepBuilders.get(StepConfig.UNIPROT_TREMBL_XML_FILE_STEP)
+				.<UniprotEntry, UniprotEntry> chunk(5000)
+				.reader(uniprotTremblReader)
+				.processor(uniprotEntryTremblProcessor)
+				.writer(uniprotTremblWriter)
+				.listener(logProcessListener)
+				.build();
+	}
+	
 	@Bean
 	public Job job() {
-		return jobBuilders.get("validationJob").start(stagingSchemaInitStep())
+		return jobBuilders.get("validationJob").listener(jobListener).start(stagingSchemaInitStep())
 				.next(step1())
-				// .next(step2())
-				//.next(step3())
+				.next(step2())
+				.next(step3())
 				.next(step4())
+				.next(step5())
+				.next(step6())
 				.next(postDeployStep()).build();
 	}
 

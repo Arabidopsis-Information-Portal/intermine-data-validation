@@ -20,6 +20,18 @@ public class ValidationStats {
 	
 	public static Counter ncbiGenePubMedGeneNotTargetLookupTaxonRecordCount = new Counter();
 	
+	public static Counter uniprotSwissProtInputRecordCount = new Counter();
+	
+	public static Counter uniprotSwissProtProcessedRecordCount = new Counter();
+	
+	public static Counter uniprotSwissProtSkippedRecordCount = new Counter();
+	
+	public static Counter uniprotTremblInputRecordCount = new Counter();
+	
+	public static Counter uniprotTremblProcessedRecordCount = new Counter();
+	
+	public static Counter uniprotTremblSkippedRecordCount = new Counter();
+	
 	
 	public static String getStatistics() {
 		StringBuilder result = new StringBuilder("Overall Statistics: "
@@ -75,4 +87,40 @@ public static String getNCBIGenePubMedStatistics() {
 		
 	}
 
+
+	public static String getUniprotSwissProtStatistics() {
+
+		StringBuilder result = new StringBuilder("Statistics: " + "\n");
+
+		result.append("Total UniprotSwissProt Record Input Count: "
+				+ uniprotSwissProtInputRecordCount.getValue() + "\n");
+
+		result.append("Total UniprotSwissProt  Processed Record Count: "
+				+ uniprotSwissProtProcessedRecordCount.getValue() + "\n");
+
+		result.append("Total UniprotSwissProt Skipped/Error Record Count: "
+				+ uniprotSwissProtSkippedRecordCount.getValue() + "\n");
+
+		return result.toString();
+
+	}
+	
+	
+	public static String getUniprotTremblStatistics() {
+		
+		StringBuilder result = new StringBuilder("Statistics: "
+				+ "\n");
+		
+		result.append("Total UniprotTrembl Record Input Count: "
+				+   uniprotTremblInputRecordCount.getValue() + "\n");
+		
+		result.append("Total UniprotTrembl  Processed Record Count: "
+				+   uniprotTremblProcessedRecordCount.getValue() + "\n");
+		
+		result.append("Total UniprotTrembl Skipped/Error Record Count: "
+				+   uniprotTremblSkippedRecordCount.getValue() + "\n");
+		
+		return result.toString();
+		
+	}
 }

@@ -26,3 +26,27 @@ taxon_id varchar(255),
 gene_id varchar(255),
 pubmed_id varchar(255)
 );
+
+CREATE TABLE staging.uniprot_swissprot (
+	primary_identifier varchar(255),
+	primary_accession varchar(255),
+	uniprot_accession varchar(255),
+	protein_synonym varchar(255),
+	gene_primary_identifier varchar(255),
+	gene_symbol varchar(255),
+	tair_identifier varchar(255),
+	pubmed_id text,
+	dataset varchar(255)
+	);
+	
+CREATE TABLE staging.uniprot_trembl (
+	primary_identifier varchar(255),
+	primary_accession varchar(255),
+	uniprot_accession varchar(255),
+	protein_synonym varchar(255),
+	gene_primary_identifier varchar(255),
+	gene_symbol varchar(255),
+	tair_identifier varchar(255),
+	pubmed_id text,
+	dataset varchar(255)
+	);

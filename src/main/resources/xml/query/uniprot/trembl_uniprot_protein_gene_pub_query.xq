@@ -20,15 +20,16 @@ return
 <geneSymbol>
 {data($entry/un:gene/un:name[@type='primary'])}
 </geneSymbol>
-<publications>
 <pubMedId>
 {data($entry//un:dbReference[@type='PubMed']/@id)}
 </pubMedId>
-</publications>
 <organism>
 {data($entry//un:organism/un:dbReference[@type='NCBI Taxonomy']/@id)}
 </organism>
 <tairIdentifier>
 {data($entry//un:source/un:dbReference[@type='TAIR']/@id)}
 </tairIdentifier>
+<dataset>
+Trembl
+</dataset>
 </uniprot_entry>
