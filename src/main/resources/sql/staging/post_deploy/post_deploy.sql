@@ -18,3 +18,9 @@ ON staging.uniprot_trembl(primary_identifier);
 
 CREATE INDEX pubmed_id_uniprot_trembl_idx
 ON staging.uniprot_trembl(pubmed_id);
+
+CREATE INDEX dataset_uniprot_swissprot_idx
+ON staging.uniprot_swissprot(dataset);
+
+CREATE INDEX dataset_uniprot_trembl_idx
+ON staging.uniprot_trembl(dataset);

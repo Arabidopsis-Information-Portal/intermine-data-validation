@@ -57,3 +57,43 @@ SELECT
     pt.primary_identifier,
     regexp_split_to_table(pt.isoform_identifier, E' ') AS isoform_id
 FROM staging.uniprot_swissprot pt
+
+
+SELECT
+count(	g.primaryidentifier)
+FROM
+	gene g JOIN bioEntitiespublications bp
+		ON
+		bp.bioentities = g.id JOIN publication p
+		ON
+		p.id = bp.publications
+		where p.title is null
+		
+		
+		
+	SELECT
+	distinct
+	pt.primaryidentifier,
+		p.pubmedid
+FROM
+	 protein pt
+	 join
+	 bioEntitiespublications bp
+		ON
+		bp.bioentities = pt.id JOIN publication p
+		ON
+		p.id = bp.publications
+		
+	select count(*) from (	
+		SELECT
+	distinct
+	pt.primaryidentifier,
+		p.pubmedid
+FROM
+	 protein pt
+	 join
+	 bioEntitiespublications bp
+		ON
+		bp.bioentities = pt.id JOIN publication p
+		ON
+		p.id = bp.publications ) V

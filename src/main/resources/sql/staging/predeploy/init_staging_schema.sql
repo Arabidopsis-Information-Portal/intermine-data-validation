@@ -214,5 +214,153 @@ false as is_canonical
 from 
 staging.uniprot_isoform pt;
 	
+create view staging.uniprot_pub as 
+SELECT
+distinct pt.primary_identifier,
+regexp_split_to_table(
+pt.pubmed_id,
+E' ')
+	AS pubmed_id
+FROM
+	staging.uniprot_input_source pt;
+	
+	
+CREATE VIEW staging.target_protein_pub as
+SELECT
+	distinct
+	pt.primaryidentifier,
+	p.pubmedid,
+	d.name entity_dataset_name
+FROM
+protein pt
+JOIN bioEntitiespublications bp
+ON
+bp.bioentities = pt.id 
+JOIN publication p
+ON
+	p.id = bp.publications
+join 
+bioentitiesdatasets bd
+on bd.bioentities = pt.id
+join dataset d
+on d.id = bd.datasets;
 
 
+CREATE VIEW staging.target_gene_pub as
+SELECT
+	distinct
+	g.primaryidentifier,
+	p.pubmedid,
+	d.name entity_dataset_name
+FROM
+gene g
+JOIN bioEntitiespublications bp
+ON
+bp.bioentities = g.id 
+JOIN publication p
+ON
+	p.id = bp.publications
+join 
+bioentitiesdatasets bd
+on bd.bioentities = g.id
+join dataset d
+on d.id = bd.datasets;
+
+
+CREATE VIEW staging.target_transcripts_pub as
+SELECT
+	distinct
+	m.primaryidentifier,
+	p.pubmedid,
+	d.name entity_dataset_name
+FROM
+mrna m
+JOIN bioEntitiespublications bp
+ON
+bp.bioentities = m.id 
+JOIN publication p
+ON
+	p.id = bp.publications
+join 
+bioentitiesdatasets bd
+on bd.bioentities = m.id
+join dataset d
+on d.id = bd.datasets;
+
+
+CREATE VIEW staging.target_protein as
+select 
+distinct
+pt.primaryidentifier, d.name entity_dataset_name  from 
+protein pt
+join 
+bioentity b
+on pt.id = b.id
+join 
+bioentitiesdatasets bd
+on bd.bioentities = b.id
+join dataset d
+on d.id = bd.datasets;
+
+CREATE VIEW staging.target_protein_uniprot as
+select 
+distinct
+pt.primaryidentifier, d.name entity_dataset_name  from 
+protein pt
+join 
+bioentity b
+on pt.id = b.id
+join 
+bioentitiesdatasets bd
+on bd.bioentities = b.id
+join dataset d
+on d.id = bd.datasets
+where 
+d.name in ('TrEMBL data set', 'Swiss-Prot data set');
+
+create view staging.not_existing_uniprot_records as
+select
+distinct 
+V.primary_identifier,
+s.gene_primary_identifier,
+s.dataset
+from(
+select 
+distinct
+s.primary_identifier
+from 
+staging.uniprot_input_source s
+except
+select 
+distinct
+s.primaryidentifier
+from
+staging.target_protein_uniprot s ) V
+join
+staging.uniprot_raw_source s
+on s.primary_identifier = V.primary_identifier;
+
+
+create view staging.not_existing_uniprot_pub_records as
+select 
+distinct
+V.primary_identifier,
+V.pubmed_id,
+s.gene_primary_identifier,
+s.dataset
+from (
+select
+distinct
+s.primary_identifier,
+s.pubmed_id
+from staging.uniprot_pub s
+except
+select
+distinct
+s.primaryidentifier,
+s.pubmedid
+from
+staging.target_protein_pub s ) V
+join
+staging.uniprot_raw_source s
+on s.primary_identifier = V.primary_identifier;
