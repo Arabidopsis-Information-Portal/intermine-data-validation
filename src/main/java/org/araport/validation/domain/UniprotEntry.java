@@ -11,12 +11,17 @@ public class UniprotEntry {
 	private String primaryIdentifier;
 	private String primaryAccession;
 	private String uniprotAccession;
+	private String uniprotName;
+	private String canonicalIsoformAccession;
+	private String isoformAccession;
+	private String isoformIdentifier;
 	private String proteinSynonym;
 	private String genePrimaryIdentifier;
 	private String geneSymbol;
 	private String tairIdentifier;
 	private String pubMedId;
 	private String dataSet;
+	
 	
 	public UniprotEntry(){
 		
@@ -96,18 +101,56 @@ public class UniprotEntry {
 	public void setDataSet(String dataSet) {
 		this.dataSet = dataSet;
 	}
+	
+	@XmlElement(name = "uniprotName")
+	public String getUniprotName() {
+		return uniprotName;
+	}
+	
+	public void setUniprotName(String uniprotName) {
+		this.uniprotName = uniprotName;
+	}
+
+	@XmlElement(name = "canonicalIsoform")
+	public String getCanonicalIsoformAccession() {
+		return canonicalIsoformAccession;
+	}
+
+	public void setCanonicalIsoformAccession(String canonicalIsoformAccession) {
+		this.canonicalIsoformAccession = canonicalIsoformAccession;
+	}
+
+	@XmlElement(name = "isoform")
+	public String getIsoformAccession() {
+		return isoformAccession;
+	}
+
+	public void setIsoformAccession(String isoformAccession) {
+		this.isoformAccession = isoformAccession;
+	}
+	
+	public String getIsoformIdentifier() {
+		return isoformIdentifier;
+	}
+
+	public void setIsoformIdentifier(String isoformIdentifier) {
+		this.isoformIdentifier = isoformIdentifier;
+	}
+
 	@Override
 	public String toString() {
 		return "UniprotEntry [primaryIdentifier=" + primaryIdentifier
 				+ ", primaryAccession=" + primaryAccession
-				+ ", uniprotAccession=" + uniprotAccession
+				+ ", uniprotAccession=" + uniprotAccession + ", uniprotName="
+				+ uniprotName + ", canonicalIsoformAccession="
+				+ canonicalIsoformAccession + ", isoformAccession="
+				+ isoformAccession + ", isoformIdentifier=" + isoformIdentifier
 				+ ", proteinSynonym=" + proteinSynonym
 				+ ", genePrimaryIdentifier=" + genePrimaryIdentifier
 				+ ", geneSymbol=" + geneSymbol + ", tairIdentifier="
-				+ tairIdentifier + ", pubMedList=" + pubMedId + ", dataSet="
+				+ tairIdentifier + ", pubMedId=" + pubMedId + ", dataSet="
 				+ dataSet + "]";
 	}
-	
-	
+
 	
 }

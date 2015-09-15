@@ -17,27 +17,58 @@ public class UniprotEntryTrembItemProcessor implements ItemProcessor<UniprotEntr
     	
     	ValidationStats.uniprotTremblInputRecordCount.increment();
     	
-    	final String primaryIdentifier = trimAttributeValue(item.getPrimaryIdentifier());
-    	final String primaryAccession = trimAttributeValue(item.getPrimaryAccession());
-    	final String uniprotAccession = trimAttributeValue(item.getUniprotAccession());
-    	final String proteinSynonym = trimAttributeValue(item.getProteinSynonym());
-    	final String genePrimaryIdentifier = trimAttributeValue(item.getGenePrimaryIdentifier());
-    	final String geneSymbol = trimAttributeValue(item.getGeneSymbol());
-    	final String tairIdentifier = trimAttributeValue(item.getTairIdentifier());
-    	final String pubMedId = trimAttributeValue(item.getPubMedId());
-    	final String dataSet = trimAttributeValue(item.getDataSet());
-    	        
-    	final UniprotEntry transformedItem = new UniprotEntry();
-    	transformedItem.setPrimaryIdentifier(primaryIdentifier);
-    	transformedItem.setPrimaryAccession(primaryAccession);
-    	
-    	transformedItem.setUniprotAccession(uniprotAccession);
-    	transformedItem.setProteinSynonym(proteinSynonym);
-    	transformedItem.setGenePrimaryIdentifier(genePrimaryIdentifier);
-    	transformedItem.setGeneSymbol(geneSymbol);
-    	transformedItem.setTairIdentifier(tairIdentifier);
-    	transformedItem.setPubMedId(pubMedId);
-    	transformedItem.setDataSet(dataSet);
+    	final String primaryIdentifier = trimAttributeValue(item
+				.getPrimaryIdentifier());
+		final String primaryAccession = trimAttributeValue(item
+				.getPrimaryAccession());
+		final String uniprotAccession = trimAttributeValue(item
+				.getUniprotAccession());
+		final String proteinSynonym = trimAttributeValue(item
+				.getProteinSynonym());
+
+		final String uniprotName = trimAttributeValue(item.getUniprotName());
+		final String canonicalIsoformAccession = trimAttributeValue(item
+				.getCanonicalIsoformAccession());
+		final String isoformAccession = trimAttributeValue(item
+				.getIsoformAccession());
+
+		final String genePrimaryIdentifier = trimAttributeValue(item
+				.getGenePrimaryIdentifier());
+		final String geneSymbol = trimAttributeValue(item.getGeneSymbol());
+		final String tairIdentifier = trimAttributeValue(item
+				.getTairIdentifier());
+		final String pubMedId = trimAttributeValue(item.getPubMedId());
+		final String dataSet = trimAttributeValue(item.getDataSet());
+
+		String isoformIdentifier = null;
+
+		if (StringUtils.isNotBlank(isoformAccession)
+				&& StringUtils.isNotBlank(primaryIdentifier)
+				) {
+			isoformIdentifier = generateIsoformIdentifier(primaryIdentifier,
+					isoformAccession);
+		}
+
+		log.info("Primary Identifer: " + primaryIdentifier
+				+ "Primary Accession: " + primaryAccession
+				+ "; Isoform Identifier: " + isoformIdentifier);
+
+		final UniprotEntry transformedItem = new UniprotEntry();
+		transformedItem.setPrimaryIdentifier(primaryIdentifier);
+		transformedItem.setPrimaryAccession(primaryAccession);
+
+		transformedItem.setUniprotAccession(uniprotAccession);
+		transformedItem.setProteinSynonym(proteinSynonym);
+		transformedItem.setUniprotName(uniprotName);
+		transformedItem.setCanonicalIsoformAccession(canonicalIsoformAccession);
+		transformedItem.setIsoformAccession(isoformAccession);
+		transformedItem.setIsoformIdentifier(isoformIdentifier);
+
+		transformedItem.setGenePrimaryIdentifier(genePrimaryIdentifier);
+		transformedItem.setGeneSymbol(geneSymbol);
+		transformedItem.setTairIdentifier(tairIdentifier);
+		transformedItem.setPubMedId(pubMedId);
+		transformedItem.setDataSet(dataSet);
       	
         log.info("Converting (" + item + ") into (" + transformedItem + ")");
         
@@ -50,15 +81,34 @@ public class UniprotEntryTrembItemProcessor implements ItemProcessor<UniprotEntr
     }
 
     
-    private String trimAttributeValue(final String attribute){
+private String trimAttributeValue(final String attribute){
     	
     	String result = attribute;
     	
     	if (!StringUtils.isBlank( attribute)){
     		result.trim();
+    	}else
+    	{
+    		result = null;
     	}
     	
     	return result;
     	
     }
+
+
+private String generateIsoformIdentifier(final String primaryIdentifier,
+		final String primaryAccession) {
+
+	StringBuilder builder = new StringBuilder(primaryIdentifier);
+
+	if (!StringUtils.isBlank(primaryAccession)) {
+		String[] token = primaryAccession.split("\\-");
+
+		if (token.length == 2) {
+			builder.append("-").append(token[1]);
+		}
+	}
+	return builder.toString();
+}
 }

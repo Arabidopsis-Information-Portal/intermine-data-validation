@@ -14,6 +14,15 @@ return
 <proteinPrimaryIdentifier>
 {data($entry/un:name)}
 </proteinPrimaryIdentifier>
+<uniprotName>
+{data($entry/un:name)}
+</uniprotName>
+<canonicalIsoform>
+{data($entry//un:isoform[un:sequence[@type='displayed']]/un:id)}
+</canonicalIsoform>
+<isoform>
+{data($entry//un:isoform[un:sequence[@type='described']]/un:id)}
+</isoform>
 <genePrimaryIdentifier>
 {data($entry/un:gene/un:name[@type='ordered locus'])}
 </genePrimaryIdentifier>
@@ -21,7 +30,7 @@ return
 {data($entry/un:gene/un:name[@type='primary'])}
 </geneSymbol>
 <pubMedId>
-{data($entry//un:dbReference[@type='PubMed']/@id)}
+{data($entry//un:citation/un:dbReference[@type='PubMed']/@id)}
 </pubMedId>
 <organism>
 {data($entry//un:organism/un:dbReference[@type='NCBI Taxonomy']/@id)}
@@ -30,6 +39,6 @@ return
 {data($entry//un:source/un:dbReference[@type='TAIR']/@id)}
 </tairIdentifier>
 <dataset>
-Swiss-Prot
+{data($entry/@dataset)}
 </dataset>
 </uniprot_entry>
